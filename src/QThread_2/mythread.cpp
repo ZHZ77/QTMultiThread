@@ -2,31 +2,27 @@
 #include <QVector>
 #include <QElapsedTimer>
 #include <QDebug>
+#include <QThread>
 
-
-Generate::Generate(QObject *parent) : QThread{parent}
+Generate::Generate(QObject *parent) : QObject{parent}
 {
 
 
 }
 
-void Generate::recvNum(int num)
-{
-    m_num = num;
-}
 
-void Generate::run()
+void Generate::working(int num)
 {
     qDebug() << "生成随机数的线程的线程地址：" << QThread::currentThread();
     QVector<int> list;
     QElapsedTimer time;
     time.start();
-    for (int i =0; i < m_num; ++i)
+    for (int i =0; i < num; ++i)
     {
         list.push_back(qrand() % 100000);
     }
     int milsec = time.elapsed();
-    qDebug() << "生成" << m_num << "个随机数共用时" << milsec << "ms";
+    qDebug() << "生成" << num << "个随机数共用时" << milsec << "ms";
     emit sendArray(list);
 }
 
@@ -35,32 +31,28 @@ BubbleSort::BubbleSort(QObject *parent)
 
 }
 
-void BubbleSort::recvArray(QVector<int> list)
-{
-    m_list = list;
-}
 
-void BubbleSort::run()
+void BubbleSort::working(QVector<int> list)
 {
     qDebug() << "冒泡排序线程的线程地址：" << QThread::currentThread();
     QElapsedTimer time;
     time.start();
-    for (int i =0; i<m_list.size(); ++i)
+    for (int i =0; i<list.size(); ++i)
     {
-        for(int j =0; j<m_list.size()-i-1; ++j)
+        for(int j =0; j<list.size()-i-1; ++j)
         {
             int temp;
-            if(m_list[j]>m_list[j+1])
+            if(list[j]>list[j+1])
             {
-                temp = m_list[j];
-                m_list[j] = m_list[j+1];
-                m_list[j+1] = temp;
+                temp = list[j];
+                list[j] = list[j+1];
+                list[j+1] = temp;
             }
         }
     }
     int milsec = time.elapsed();
     qDebug() << "冒泡排序共用时:" << milsec << "ms";
-    emit finish(m_list);
+    emit finish(list);
 }
 
 QuickSort::QuickSort(QObject *parent)
@@ -68,21 +60,18 @@ QuickSort::QuickSort(QObject *parent)
 
 }
 
-void QuickSort::recvArray(QVector<int> list)
-{
-    m_list = list;
-}
 
-void QuickSort::run()
+
+void QuickSort::working(QVector<int> list)
 {
     qDebug() << "快速排序线程的线程地址：" << QThread::currentThread();
     QElapsedTimer time;
     time.start();
-    quickSort(m_list, 0, m_list.size()-1);
+    quickSort(list, 0, list.size()-1);
 
     int milsec = time.elapsed();
     qDebug() << "快速排序共用时:" << milsec << "ms";
-    emit finish(m_list);
+    emit finish(list);
 
 }
 

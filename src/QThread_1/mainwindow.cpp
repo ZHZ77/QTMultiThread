@@ -31,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
             }
             });
 
-
     connect(bubble,&BubbleSort::finish,this,[=](QVector<int> list){
         for(int i=0;i<list.size();++i){
             ui->bubbleList->addItem(QString::number(list.at(i)));
@@ -42,6 +41,21 @@ MainWindow::MainWindow(QWidget *parent)
         for(int i=0;i<list.size();++i){
             ui->quickList->addItem(QString::number(list.at(i)));
         }
+    });
+
+    connect(this,&MainWindow::destroyed,this,[=](){
+        gen->quit();
+        gen->wait();
+        gen->deleteLater();
+
+        bubble->quit();
+        bubble->wait();
+        bubble->deleteLater();
+
+        quick->quit();
+        quick->wait();
+        quick->deleteLater();
+
     });
 
 }
